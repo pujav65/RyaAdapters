@@ -22,11 +22,11 @@ under the License.
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.rya</groupId>
-        <artifactId>rya.extras</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <artifactId>rya-adapter-examples</artifactId>
+        <version>3.2.11-incubating-SNAPSHOT</version>
     </parent>
 
-    <artifactId>rya.indexing.example</artifactId>
+    <artifactId>rya.jena.example</artifactId>
     <name>Apache Rya Secondary Indexing Example</name>
 
     <dependencies>
