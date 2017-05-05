@@ -24,7 +24,7 @@
  */
 package org.apache.rya.jena.jenasesame;
 
-import org.apache.rya.openjena.legacy.atlas.junit.BaseTest;
+import org.apache.jena.atlas.junit.BaseTest;
 import org.junit.Test;
 
 public class TestSparqlJS extends BaseTest {

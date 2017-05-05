@@ -29,13 +29,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.List;
 
 import org.apache.jena.atlas.iterator.Iter;
-import org.apache.jena.graph.GraphEvents;
-import org.apache.jena.graph.Node;
-import org.apache.jena.graph.Triple;
-import org.apache.jena.graph.impl.GraphWithPerform;
-import org.apache.jena.util.iterator.ExtendedIterator;
-import org.apache.rya.jena.legacy.graph.BulkUpdateHandler;
-import org.apache.rya.jena.legacy.graph.impl.SimpleBulkUpdateHandler;
+
+import com.hp.hpl.jena.graph.BulkUpdateHandler;
+import com.hp.hpl.jena.graph.GraphEvents;
+import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.graph.Triple;
+import com.hp.hpl.jena.graph.impl.GraphWithPerform;
+import com.hp.hpl.jena.graph.impl.SimpleBulkUpdateHandler;
+import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 
 /**
  * Bulk update handler.

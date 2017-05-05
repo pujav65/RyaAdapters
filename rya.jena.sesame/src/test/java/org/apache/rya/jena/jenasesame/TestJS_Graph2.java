@@ -24,13 +24,14 @@
  */
 package org.apache.rya.jena.jenasesame;
 
-import org.apache.jena.graph.Graph;
-import org.apache.jena.shared.JenaException;
 import org.apache.rya.jena.jenasesame.impl.GraphRepository;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.memory.MemoryStore;
+
+import com.hp.hpl.jena.graph.Graph;
+import com.hp.hpl.jena.shared.JenaException;
 
 public class TestJS_Graph2 extends AbstractTestGraph2 {
     @Override

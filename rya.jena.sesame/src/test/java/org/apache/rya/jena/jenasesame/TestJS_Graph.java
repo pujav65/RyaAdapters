@@ -24,8 +24,8 @@
  */
 package org.apache.rya.jena.jenasesame;
 
-import org.apache.jena.graph.Graph;
-import org.apache.jena.graph.test.AbstractTestGraph;
+import com.hp.hpl.jena.graph.Graph;
+import com.hp.hpl.jena.graph.test.AbstractTestGraph;
 
 public class TestJS_Graph extends AbstractTestGraph {
     public TestJS_Graph(final String name) {

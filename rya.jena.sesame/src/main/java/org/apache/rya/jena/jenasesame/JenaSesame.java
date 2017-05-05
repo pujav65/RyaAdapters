@@ -24,19 +24,20 @@
  */
 package org.apache.rya.jena.jenasesame;
 
-import org.apache.jena.graph.Graph;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.sparql.core.DatasetGraph;
-import org.apache.jena.sparql.engine.QueryEngineFactory;
-import org.apache.jena.sparql.engine.QueryEngineRegistry;
 import org.apache.rya.jena.jenasesame.impl.GraphRepository;
 import org.apache.rya.jena.jenasesame.impl.JenaSesameDatasetGraph;
 import org.apache.rya.jena.jenasesame.impl.JenaSesameQueryEngineFactory;
 import org.openrdf.model.Resource;
 import org.openrdf.repository.RepositoryConnection;
+
+import com.hp.hpl.jena.graph.Graph;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.DatasetFactory;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.sparql.core.DatasetGraph;
+import com.hp.hpl.jena.sparql.engine.QueryEngineFactory;
+import com.hp.hpl.jena.sparql.engine.QueryEngineRegistry;
 
 /**
  * Jena API over Sesame repository
@@ -85,7 +86,7 @@ public class JenaSesame {
      */
     public static Dataset createDataset(final RepositoryConnection connection) {
         final DatasetGraph dsg = new JenaSesameDatasetGraph(connection);
-        return DatasetFactory.wrap(dsg);
+        return DatasetFactory.create(dsg);
     }
 }
 

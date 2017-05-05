@@ -28,18 +28,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.atlas.lib.NotImplemented;
-import org.apache.jena.graph.Node;
-import org.apache.jena.sparql.ARQException;
-import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.engine.binding.Binding;
-import org.apache.jena.sparql.engine.binding.BindingFactory;
-import org.apache.jena.sparql.engine.binding.BindingMap;
-import org.apache.jena.sparql.engine.iterator.QueryIteratorBase;
-import org.apache.jena.sparql.serializer.SerializationContext;
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.TupleQueryResult;
+
+import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.sparql.ARQException;
+import com.hp.hpl.jena.sparql.core.Var;
+import com.hp.hpl.jena.sparql.engine.binding.Binding;
+import com.hp.hpl.jena.sparql.engine.binding.BindingFactory;
+import com.hp.hpl.jena.sparql.engine.binding.BindingMap;
+import com.hp.hpl.jena.sparql.engine.iterator.QueryIteratorBase;
+import com.hp.hpl.jena.sparql.serializer.SerializationContext;
 
 /**
  * Sesame Query Iterator.

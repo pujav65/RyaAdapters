@@ -25,9 +25,6 @@
 package org.apache.rya.jena.jenasesame.impl;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.graph.Triple;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
@@ -35,6 +32,11 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
+
+import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.graph.NodeFactory;
+import com.hp.hpl.jena.graph.Triple;
+import com.hp.hpl.jena.rdf.model.AnonId;
 
 /**
  * Utility methods to convert nodes and values.
@@ -69,7 +71,7 @@ final class Convert {
      * @return the {@link Node}.
      */
     public static Node bnodeToNode(final BNode bnode) {
-        return NodeFactory.createBlankNode(bnode.getID());
+        return NodeFactory.createAnon(new AnonId(bnode.getID()));
     }
 
     /**

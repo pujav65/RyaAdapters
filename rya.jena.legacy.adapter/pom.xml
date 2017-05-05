@@ -27,46 +27,43 @@ under the License.
         <version>3.2.11-incubating-SNAPSHOT</version>
     </parent>
 
-    <artifactId>rya.jena.sesame</artifactId>
+    <artifactId>rya.jena.legacy.adapter</artifactId>
     <packaging>jar</packaging>
 
-    <name>Jena Sesame</name>
-    <description>Jena API over a Sesame repository</description>
+    <name>Jena Legacy Adapter</name>
+    <description>Adapt classes to support Jena 3.x</description>
+
+    <properties>
+        <jena.latest.core.version>3.1.0</jena.latest.core.version>
+        <jena.latest.arq.version>3.1.0</jena.latest.arq.version>
+    </properties>
 
     <dependencies>
         <!-- Jena and ARQ - including testing support -->
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-core</artifactId>
+            <version>${jena.latest.core.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-core</artifactId>
             <classifier>tests</classifier>
-            <version>${jena.core.version}</version>
+            <version>${jena.latest.core.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-arq</artifactId>
+            <version>${jena.latest.arq.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-arq</artifactId>
             <classifier>tests</classifier>
-            <version>${jena.arq.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.hp.hpl.jena</groupId>
-            <artifactId>arq</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.rya</groupId>
-            <artifactId>rya.sail</artifactId>
+            <version>${jena.latest.arq.version}</version>
         </dependency>
 
         <dependency>
@@ -75,31 +72,9 @@ under the License.
         </dependency>
 
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- OpenRDF Sesame -->
-        <dependency>
-            <groupId>org.openrdf.sesame</groupId>
-            <artifactId>sesame-runtime</artifactId>
         </dependency>
     </dependencies>
 
@@ -126,26 +101,6 @@ under the License.
                 </executions>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptors>
-                        <descriptor>assembly.xml</descriptor>
-                    </descriptors>
-                    </configuration>
-                    <executions>
-                        <execution>
-                        <id>create-assembly</id>
-                        <!-- Better after package because of javadoc, sources (and test-jar if any) -->
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
              <plugin>
                  <groupId>org.apache.maven.plugins</groupId>
                  <artifactId>maven-dependency-plugin</artifactId>
@@ -156,17 +111,6 @@ under the License.
                      <overWriteIfNewer>true</overWriteIfNewer>
                  </configuration>
              </plugin>
-
-            <plugin>
-                <groupId>org.apache.rat</groupId>
-                <artifactId>apache-rat-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <!-- JenaSesame Test RDF Data Files -->
-                        <exclude>src/test/resources/**</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 </project>

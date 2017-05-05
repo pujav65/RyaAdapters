@@ -27,20 +27,7 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.InfModel;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.StmtIterator;
-import org.apache.jena.reasoner.Reasoner;
-import org.apache.jena.reasoner.rulesys.GenericRuleReasoner;
-import org.apache.jena.reasoner.rulesys.Rule;
-import org.apache.jena.reasoner.rulesys.Rule.Parser;
 import org.apache.log4j.Logger;
-import org.apache.rya.api.RdfCloudTripleStoreConfiguration;
 import org.apache.rya.api.RdfCloudTripleStoreConfiguration;
 import org.apache.rya.api.domain.RyaStatement;
 import org.apache.rya.api.persist.RyaDAO;
@@ -48,21 +35,15 @@ import org.apache.rya.api.persist.RyaDAOException;
 import org.apache.rya.api.persist.query.RyaQuery;
 import org.apache.rya.api.resolver.RdfToRyaConversions;
 import org.apache.rya.indexing.GeoConstants;
-import org.apache.rya.indexing.GeoConstants;
-import org.apache.rya.indexing.accumulo.ConfigUtils;
 import org.apache.rya.indexing.accumulo.ConfigUtils;
 import org.apache.rya.jena.jenasesame.JenaSesame;
 import org.apache.rya.mongodb.MockMongoFactory;
 import org.apache.rya.mongodb.MongoConnectorFactory;
 import org.apache.rya.mongodb.MongoDBRdfConfiguration;
-import org.apache.rya.mongodb.MongoDBRdfConfiguration;
 import org.apache.rya.mongodb.MongoDBRyaDAO;
 import org.apache.rya.rdftriplestore.RdfCloudTripleStore;
-import org.apache.rya.rdftriplestore.RdfCloudTripleStore;
-import org.apache.rya.sail.config.RyaSailFactory;
 import org.apache.rya.sail.config.RyaSailFactory;
 import org.calrissian.mango.collect.CloseableIterable;
-import org.glassfish.grizzly.http.util.Charsets;
 import org.openrdf.model.Statement;
 import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
@@ -78,6 +59,19 @@ import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.repository.sail.SailRepositoryConnection;
 import org.openrdf.sail.Sail;
 
+import com.google.common.base.Charsets;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.rdf.model.InfModel;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.reasoner.Reasoner;
+import com.hp.hpl.jena.reasoner.rulesys.GenericRuleReasoner;
+import com.hp.hpl.jena.reasoner.rulesys.Rule;
+import com.hp.hpl.jena.reasoner.rulesys.Rule.Parser;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 
@@ -117,6 +111,8 @@ public class MongoRyaDirectExample {
             testJenaSesameReasoningWithRules(conn);
 
             log.info("TIME: " + (System.currentTimeMillis() - start) / 1000.);
+        } catch(final Exception e) {
+            log.error("Encountered error running MongoDB example", e);
         } finally {
             log.info("Shutting down");
             closeQuietly(conn);
@@ -275,7 +271,7 @@ public class MongoRyaDirectExample {
 
             Reasoner reasoner = null;
             try (
-                final InputStream in = IOUtils.toInputStream(ruleSource, Charsets.UTF8_CHARSET);
+                final InputStream in = IOUtils.toInputStream(ruleSource, Charsets.UTF_8);
                 final BufferedReader br = new BufferedReader(new InputStreamReader(in));
             ) {
                 final Parser parser = Rule.rulesParserFromReader(br);
@@ -288,7 +284,7 @@ public class MongoRyaDirectExample {
 
             int count = 0;
             while (iterator.hasNext()) {
-                final org.apache.jena.rdf.model.Statement stmt = iterator.nextStatement();
+                final com.hp.hpl.jena.rdf.model.Statement stmt = iterator.nextStatement();
 
                 final Resource subject = stmt.getSubject();
                 final Property predicate = stmt.getPredicate();

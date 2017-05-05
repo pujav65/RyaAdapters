@@ -27,22 +27,23 @@ package org.apache.rya.jena.jenasesame.impl;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.jena.atlas.lib.Closeable;
-import org.apache.jena.query.Query;
-import org.apache.jena.sparql.ARQException;
-import org.apache.jena.sparql.algebra.Op;
-import org.apache.jena.sparql.core.DatasetGraph;
-import org.apache.jena.sparql.engine.Plan;
-import org.apache.jena.sparql.engine.PlanBase;
-import org.apache.jena.sparql.engine.QueryEngineBase;
-import org.apache.jena.sparql.engine.QueryIterator;
-import org.apache.jena.sparql.engine.binding.Binding;
-import org.apache.jena.sparql.util.Context;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.RepositoryException;
+
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.sparql.ARQException;
+import com.hp.hpl.jena.sparql.algebra.Op;
+import com.hp.hpl.jena.sparql.core.DatasetGraph;
+import com.hp.hpl.jena.sparql.engine.Plan;
+import com.hp.hpl.jena.sparql.engine.PlanBase;
+import com.hp.hpl.jena.sparql.engine.QueryEngineBase;
+import com.hp.hpl.jena.sparql.engine.QueryIterator;
+import com.hp.hpl.jena.sparql.engine.binding.Binding;
+import com.hp.hpl.jena.sparql.util.Context;
 
 /**
  * Query Engine for Jena Sesame.

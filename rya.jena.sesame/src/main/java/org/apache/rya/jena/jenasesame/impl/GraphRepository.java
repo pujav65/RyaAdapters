@@ -26,19 +26,7 @@ package org.apache.rya.jena.jenasesame.impl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.graph.Triple;
-import org.apache.jena.shared.JenaException;
-import org.apache.jena.shared.PrefixMapping;
-import org.apache.jena.sparql.core.DatasetPrefixStorage;
-import org.apache.jena.util.iterator.ExtendedIterator;
-import org.apache.jena.util.iterator.NiceIterator;
 import org.apache.log4j.Logger;
-import org.apache.rya.jena.legacy.graph.BulkUpdateHandler;
-import org.apache.rya.jena.legacy.graph.query.QueryHandler;
-import org.apache.rya.jena.legacy.graph.query.SimpleQueryHandler;
-import org.apache.rya.jena.legacy.sparql.graph.GraphBase2;
 import org.apache.rya.rdftriplestore.RdfCloudTripleStoreConnection;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
@@ -49,6 +37,20 @@ import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.sail.SailRepositoryConnection;
+
+import com.hp.hpl.jena.graph.BulkUpdateHandler;
+import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.graph.NodeFactory;
+import com.hp.hpl.jena.graph.Triple;
+import com.hp.hpl.jena.graph.TripleMatch;
+import com.hp.hpl.jena.graph.query.QueryHandler;
+import com.hp.hpl.jena.graph.query.SimpleQueryHandler;
+import com.hp.hpl.jena.shared.JenaException;
+import com.hp.hpl.jena.shared.PrefixMapping;
+import com.hp.hpl.jena.sparql.core.DatasetPrefixStorage;
+import com.hp.hpl.jena.sparql.graph.GraphBase2;
+import com.hp.hpl.jena.util.iterator.ExtendedIterator;
+import com.hp.hpl.jena.util.iterator.NiceIterator;
 
 /**
  * Graph Repository.
@@ -128,14 +130,14 @@ public class GraphRepository extends GraphBase2 {
     }
 
     @Override
-    protected ExtendedIterator<Triple> graphBaseFind(final Triple m) {
+    protected ExtendedIterator<Triple> graphBaseFind(final TripleMatch m) {
         Node s = m.getMatchSubject();
         final Node p = m.getMatchPredicate();
         final Node o = m.getMatchObject();
 
         if (connection instanceof SailRepositoryConnection && ((SailRepositoryConnection)connection).getSailConnection() instanceof RdfCloudTripleStoreConnection) {
             if (s == null && p == null && o == null) {
-                s = NodeFactory.createBlankNode();
+                s = NodeFactory.createAnon();
             }
         }
 
@@ -150,6 +152,11 @@ public class GraphRepository extends GraphBase2 {
             log.error("Failed to get statements.", e);
             throw new JenaException(e);
         }
+    }
+
+    @Override
+    public ExtendedIterator<Triple> find(final Triple m) {
+        return graphBaseFind(m);
     }
 
     private static class RepositoryResultIterator extends NiceIterator<Triple> {

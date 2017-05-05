@@ -29,9 +29,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.jena.shared.PrefixMapping;
-import org.apache.jena.shared.impl.PrefixMappingImpl;
-import org.apache.jena.sparql.core.DatasetPrefixStorage;
+import com.hp.hpl.jena.shared.PrefixMapping;
+import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
+import com.hp.hpl.jena.sparql.core.DatasetPrefixStorage;
 
 /**
  * View of a dataset's prefixes for a particular graph.
