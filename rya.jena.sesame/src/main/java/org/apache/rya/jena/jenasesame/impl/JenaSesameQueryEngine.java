@@ -26,7 +26,7 @@ package org.apache.rya.jena.jenasesame.impl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.apache.jena.atlas.lib.Closeable;
+import org.openjena.atlas.lib.Closeable;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;

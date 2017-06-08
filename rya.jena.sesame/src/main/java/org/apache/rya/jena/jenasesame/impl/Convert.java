@@ -34,7 +34,6 @@ import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 
 import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.rdf.model.AnonId;
 
@@ -71,7 +70,7 @@ final class Convert {
      * @return the {@link Node}.
      */
     public static Node bnodeToNode(final BNode bnode) {
-        return NodeFactory.createAnon(new AnonId(bnode.getID()));
+        return Node.createAnon(new AnonId(bnode.getID()));
     }
 
     /**
@@ -80,7 +79,7 @@ final class Convert {
      * @return the {@link Node}.
      */
     public static Node uriToNode(final URI uri) {
-        return NodeFactory.createURI(uri.stringValue());
+        return Node.createURI(uri.stringValue());
     }
 
     /**
@@ -90,12 +89,12 @@ final class Convert {
      */
     public static Node literalToNode(final Literal literal) {
         if (literal.getLanguage() != null) {
-            return NodeFactory.createLiteral(literal.getLabel(), literal.getLanguage(), false);
+            return Node.createLiteral(literal.getLabel(), literal.getLanguage(), false);
         } else if (literal.getDatatype() != null) {
-            return NodeFactory.createLiteral(literal.getLabel(), null, NodeFactory.getType(literal.getDatatype().stringValue()));
+            return Node.createLiteral(literal.getLabel(), null, Node.getType(literal.getDatatype().stringValue()));
         } else {
             // Plain literal
-            return NodeFactory.createLiteral(literal.getLabel());
+            return Node.createLiteral(literal.getLabel());
         }
     }
 

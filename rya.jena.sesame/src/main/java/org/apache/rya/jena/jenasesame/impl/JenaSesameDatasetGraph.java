@@ -118,10 +118,6 @@ public class JenaSesameDatasetGraph implements DatasetGraph {
     }
 
     @Override
-    public void add(final Node g, final Node s, final Node p, final Node o) {
-    }
-
-    @Override
     public void addGraph(final Node graphName, final Graph graph) {
     }
 
@@ -137,10 +133,6 @@ public class JenaSesameDatasetGraph implements DatasetGraph {
 
     @Override
     public void delete(final Quad quad) {
-    }
-
-    @Override
-    public void delete(final Node g, final Node s, final Node p, final Node o) {
     }
 
     @Override
@@ -183,10 +175,6 @@ public class JenaSesameDatasetGraph implements DatasetGraph {
 
     @Override
     public void setDefaultGraph(final Graph g) {
-    }
-
-    @Override
-    public void clear() {
     }
 }
 

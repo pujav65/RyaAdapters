@@ -84,7 +84,7 @@ public class GraphPrefixesProjection extends PrefixMappingImpl {
                 return;
             }
             // Remove from cache.
-            prefixes.removeFromPrefixMap(graphName, prefix);
+            prefixes.removeFromPrefixMap(graphName, prefix, currentUri);
         }
         // Persist
         prefixes.insertPrefix(graphName, prefix, uri);
@@ -110,7 +110,7 @@ public class GraphPrefixesProjection extends PrefixMappingImpl {
     public PrefixMapping removeNsPrefix(final String prefix) {
         final String uri = super.getNsPrefixURI(prefix);
         if (uri != null) {
-            prefixes.removeFromPrefixMap(graphName, prefix);
+            prefixes.removeFromPrefixMap(graphName, prefix, uri);
         }
         super.removeNsPrefix(prefix);
         return this;

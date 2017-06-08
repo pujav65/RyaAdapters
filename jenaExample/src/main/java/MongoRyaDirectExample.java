@@ -27,7 +27,11 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 import org.apache.rya.api.RdfCloudTripleStoreConfiguration;
 import org.apache.rya.api.domain.RyaStatement;
 import org.apache.rya.api.persist.RyaDAO;
@@ -36,6 +40,21 @@ import org.apache.rya.api.persist.query.RyaQuery;
 import org.apache.rya.api.resolver.RdfToRyaConversions;
 import org.apache.rya.indexing.GeoConstants;
 import org.apache.rya.indexing.accumulo.ConfigUtils;
+import org.apache.rya.jena.example.pellet.BnodeQueryExample;
+import org.apache.rya.jena.example.pellet.ExplanationExample;
+import org.apache.rya.jena.example.pellet.IncrementalClassifierExample;
+import org.apache.rya.jena.example.pellet.IncrementalConsistencyExample;
+import org.apache.rya.jena.example.pellet.IndividualsExample;
+import org.apache.rya.jena.example.pellet.InterruptReasoningExample;
+import org.apache.rya.jena.example.pellet.JenaReasoner;
+import org.apache.rya.jena.example.pellet.ModularityExample;
+import org.apache.rya.jena.example.pellet.OWLAPIExample;
+import org.apache.rya.jena.example.pellet.PelletExampleRunner;
+import org.apache.rya.jena.example.pellet.PersistenceExample;
+import org.apache.rya.jena.example.pellet.RulesExample;
+import org.apache.rya.jena.example.pellet.SPARQLDLExample;
+import org.apache.rya.jena.example.pellet.TerpExample;
+import org.apache.rya.jena.example.pellet.util.ExampleUtils;
 import org.apache.rya.jena.jenasesame.JenaSesame;
 import org.apache.rya.mongodb.MockMongoFactory;
 import org.apache.rya.mongodb.MongoConnectorFactory;
@@ -60,6 +79,7 @@ import org.openrdf.repository.sail.SailRepositoryConnection;
 import org.openrdf.sail.Sail;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableList;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.InfModel;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -91,6 +111,7 @@ public class MongoRyaDirectExample {
     private static final String MONGO_INSTANCE_PORT = "27017";
 
     public static void main(final String[] args) throws Exception {
+        setupLogging();
         final Configuration conf = getConf();
         conf.setBoolean(ConfigUtils.DISPLAY_QUERY_PLAN, PRINT_QUERIES);
 
@@ -110,6 +131,8 @@ public class MongoRyaDirectExample {
             log.info("Running Jena Sesame Reasoning with Rules Example");
             testJenaSesameReasoningWithRules(conn);
 
+            testPelletExamples(null);
+
             log.info("TIME: " + (System.currentTimeMillis() - start) / 1000.);
         } catch(final Exception e) {
             log.error("Encountered error running MongoDB example", e);
@@ -122,6 +145,19 @@ public class MongoRyaDirectExample {
             }
             MongoConnectorFactory.closeMongoClient();
         }
+    }
+
+    public static void setupLogging() {
+        // Turn off all the loggers and customize how they write to the console.
+        final Logger rootLogger = LogManager.getRootLogger();
+        rootLogger.setLevel(Level.OFF);
+        final ConsoleAppender ca = (ConsoleAppender) rootLogger.getAppender("stdout");
+        //ca.setLayout(new PatternLayout("%-5p - %m%n"));
+        ca.setLayout(new PatternLayout("%d{MMM dd yyyy HH:mm:ss} %5p [%t] (%F:%L) - %m%n"));
+
+        // Turn the loggers used by the demo back on.
+        //log.setLevel(Level.INFO);
+        rootLogger.setLevel(Level.INFO);
     }
 
 //    private static void testAddPointAndWithinSearch(SailRepositoryConnection conn) throws Exception {
@@ -233,13 +269,15 @@ public class MongoRyaDirectExample {
         conf.set(RdfCloudTripleStoreConfiguration.CONF_INFER, Boolean.toString(USE_INFER));
         return conf;
     }
+
     protected static StatementImpl createStatement(final String subject, final String predicate, final String object) {
         return new StatementImpl(new URIImpl(subject), new URIImpl(predicate), new URIImpl(object));
     }
 
     protected static StatementImpl createStatement(final String subject, final String predicate, final String object, final String namespace) {
         return createStatement(namespace + subject, namespace + predicate, namespace + object);
-}
+    }
+
     private static void testJenaSesameReasoningWithRules(final SailRepositoryConnection conn) throws Exception {
         final Repository repo = conn.getRepository();
         RepositoryConnection addConnection = null;
@@ -320,6 +358,7 @@ public class MongoRyaDirectExample {
             }
         }
     }
+
     protected static boolean containsStatement(final RyaStatement ryaStatement, final RyaDAO<? extends RdfCloudTripleStoreConfiguration> ryaDao) throws RyaDAOException, IOException {
         final RyaQuery ryaQuery = new RyaQuery(ryaStatement);
         final CloseableIterable<RyaStatement> closeableIter = ryaDao.getQueryEngine().query(ryaQuery);
@@ -337,6 +376,45 @@ public class MongoRyaDirectExample {
         }
 
         return count > 0;
+    }
+
+    private static void testPelletExamples(final SailRepositoryConnection conn) throws Exception {
+        log.info("STARTING PELLET EXAMPLES...");
+
+        final List<PelletExampleRunner> pelletExamples = ImmutableList.<PelletExampleRunner>builder()
+            .add(new BnodeQueryExample(conn))
+            .add(new ExplanationExample(conn))
+            .add(new IncrementalClassifierExample(conn))
+            .add(new IncrementalConsistencyExample(conn))
+            .add(new IndividualsExample(conn))
+            .add(new InterruptReasoningExample(conn))
+            .add(new JenaReasoner(conn))
+            .add(new ModularityExample(conn))
+            .add(new OWLAPIExample(conn))
+            .add(new PersistenceExample(conn))
+            //.add(new QuerySubsumptionExample(conn)) // XXX Doesn't work when run from here
+            .add(new RulesExample(conn))
+            .add(new SPARQLDLExample(conn))
+            .add(new TerpExample(conn))
+            .build();
+
+        int i = 1;
+        for (final PelletExampleRunner pelletExample : pelletExamples) {
+            final String exampleName = pelletExample.getClass().getSimpleName();
+            log.info("Starting Pellet Example " + i + ": " + exampleName);
+            try {
+                pelletExample.run();
+            } finally {
+                if (conn != null) {
+                    ExampleUtils.getRyaDao(conn).dropAndDestroy();
+                }
+                pelletExample.cleanUp();
+            }
+            log.info("Finished Pellet Example " + i + ": " + exampleName);
+            i++;
+        }
+
+        log.info("FINISHED PELLET EXAMPLES");
     }
 
     private static class CountingResultHandler implements TupleQueryResultHandler {

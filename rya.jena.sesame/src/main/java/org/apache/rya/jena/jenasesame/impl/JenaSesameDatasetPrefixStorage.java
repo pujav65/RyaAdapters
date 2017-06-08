@@ -160,7 +160,7 @@ public class JenaSesameDatasetPrefixStorage implements DatasetPrefixStorage {
     }
 
     @Override
-    public void removeFromPrefixMap(final String graphName, final String prefix) {
+    public void removeFromPrefixMap(final String graphName, final String prefix, final String uri) {
         try {
             connection.removeNamespace(prefix);
         } catch (final RepositoryException e) {
@@ -174,6 +174,10 @@ public class JenaSesameDatasetPrefixStorage implements DatasetPrefixStorage {
 
     @Override
     public void sync() {
+    }
+
+    @Override
+    public void sync(final boolean force) {
     }
 }
 

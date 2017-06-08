@@ -26,8 +26,7 @@ package org.apache.rya.jena.jenasesame.impl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.apache.jena.atlas.io.IndentedWriter;
-import org.apache.jena.atlas.lib.NotImplemented;
+import org.openjena.atlas.io.IndentedWriter;
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
@@ -78,7 +77,7 @@ public class QueryIteratorSesame extends QueryIteratorBase {
     protected Binding moveToNextBinding() {
         try {
             final BindingSet bindingSet = result.next();
-            final BindingMap arqBinding = BindingFactory.create();
+            final BindingMap arqBinding = (BindingMap) BindingFactory.create();
 
             for (final String bindingName : result.getBindingNames()) {
                 final Value value = bindingSet.getValue(bindingName);
@@ -93,11 +92,6 @@ public class QueryIteratorSesame extends QueryIteratorBase {
 
     @Override
     public void output(final IndentedWriter out, final SerializationContext sCxt) {
-    }
-
-    @Override
-    protected void requestCancel() {
-        throw new NotImplemented();
     }
 }
 

@@ -23,7 +23,7 @@ under the License.
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.rya</groupId>
-       <artifactId>rya-adapter-examples</artifactId>
+        <artifactId>rya-adapter-examples</artifactId>
         <version>3.2.11-incubating-SNAPSHOT</version>
     </parent>
 
@@ -101,16 +101,23 @@ under the License.
                 </executions>
             </plugin>
 
-             <plugin>
-                 <groupId>org.apache.maven.plugins</groupId>
-                 <artifactId>maven-dependency-plugin</artifactId>
-                 <configuration>
-                     <outputDirectory>lib2</outputDirectory>
-                     <overWriteReleases>false</overWriteReleases>
-                     <overWriteSnapshots>false</overWriteSnapshots>
-                     <overWriteIfNewer>true</overWriteIfNewer>
-                 </configuration>
-             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <configuration>
+                    <outputDirectory>lib2</outputDirectory>
+                    <overWriteReleases>false</overWriteReleases>
+                    <overWriteSnapshots>false</overWriteSnapshots>
+                    <overWriteIfNewer>true</overWriteIfNewer>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.rat</groupId>
+                <artifactId>apache-rat-plugin</artifactId>
+                <configuration>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>

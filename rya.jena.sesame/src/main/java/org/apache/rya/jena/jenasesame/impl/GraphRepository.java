@@ -40,7 +40,6 @@ import org.openrdf.repository.sail.SailRepositoryConnection;
 
 import com.hp.hpl.jena.graph.BulkUpdateHandler;
 import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.graph.TripleMatch;
 import com.hp.hpl.jena.graph.query.QueryHandler;
@@ -137,7 +136,7 @@ public class GraphRepository extends GraphBase2 {
 
         if (connection instanceof SailRepositoryConnection && ((SailRepositoryConnection)connection).getSailConnection() instanceof RdfCloudTripleStoreConnection) {
             if (s == null && p == null && o == null) {
-                s = NodeFactory.createAnon();
+                s = Node.createAnon();
             }
         }
 
@@ -152,11 +151,6 @@ public class GraphRepository extends GraphBase2 {
             log.error("Failed to get statements.", e);
             throw new JenaException(e);
         }
-    }
-
-    @Override
-    public ExtendedIterator<Triple> find(final Triple m) {
-        return graphBaseFind(m);
     }
 
     private static class RepositoryResultIterator extends NiceIterator<Triple> {
@@ -229,14 +223,6 @@ public class GraphRepository extends GraphBase2 {
     @Override
     public QueryHandler queryHandler() {
         return new SimpleQueryHandler(this);
-    }
-
-    @Override
-    public void clear() {
-    }
-
-    @Override
-    public void remove(final Node s, final Node p, final Node o) {
     }
 }
 

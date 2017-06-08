@@ -24,7 +24,7 @@
  */
 package org.apache.rya.jena.jenasesame;
 
-import org.apache.jena.atlas.junit.BaseTest;
+import org.openjena.atlas.junit.BaseTest;
 import org.apache.rya.jena.jenasesame.impl.GraphRepository;
 import org.junit.Test;
 

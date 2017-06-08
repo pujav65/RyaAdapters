@@ -23,7 +23,7 @@ under the License.
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.rya</groupId>
-       <artifactId>rya-adapter-examples</artifactId>
+        <artifactId>rya-adapter-examples</artifactId>
         <version>3.2.11-incubating-SNAPSHOT</version>
     </parent>
 
@@ -36,27 +36,15 @@ under the License.
     <dependencies>
         <!-- Jena and ARQ - including testing support -->
         <dependency>
-            <groupId>org.apache.jena</groupId>
-            <artifactId>jena-core</artifactId>
+            <groupId>com.hp.hpl.jena</groupId>
+            <artifactId>jena</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.apache.jena</groupId>
-            <artifactId>jena-core</artifactId>
+            <groupId>com.hp.hpl.jena</groupId>
+            <artifactId>jena</artifactId>
             <classifier>tests</classifier>
             <version>${jena.core.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.jena</groupId>
-            <artifactId>jena-arq</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.jena</groupId>
-            <artifactId>jena-arq</artifactId>
-            <classifier>tests</classifier>
-            <version>${jena.arq.version}</version>
         </dependency>
 
         <dependency>
@@ -65,8 +53,41 @@ under the License.
         </dependency>
 
         <dependency>
+            <groupId>com.hp.hpl.jena</groupId>
+            <artifactId>arq</artifactId>
+            <classifier>tests</classifier>
+            <version>${jena.arq.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.hp.hpl.jena</groupId>
+            <artifactId>iri</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.rya</groupId>
             <artifactId>rya.sail</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.ansell.pellet</groupId>
+            <artifactId>pellet-jena</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ansell.pellet</groupId>
+            <artifactId>pellet-owlapiv3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ansell.pellet</groupId>
+            <artifactId>pellet-modularity</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ansell.pellet</groupId>
+            <artifactId>pellet-explanation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ansell.pellet</groupId>
+            <artifactId>pellet-query</artifactId>
         </dependency>
 
         <dependency>
@@ -146,16 +167,16 @@ under the License.
                 </executions>
             </plugin>
 
-             <plugin>
-                 <groupId>org.apache.maven.plugins</groupId>
-                 <artifactId>maven-dependency-plugin</artifactId>
-                 <configuration>
-                     <outputDirectory>lib2</outputDirectory>
-                     <overWriteReleases>false</overWriteReleases>
-                     <overWriteSnapshots>false</overWriteSnapshots>
-                     <overWriteIfNewer>true</overWriteIfNewer>
-                 </configuration>
-             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <configuration>
+                    <outputDirectory>lib2</outputDirectory>
+                    <overWriteReleases>false</overWriteReleases>
+                    <overWriteSnapshots>false</overWriteSnapshots>
+                    <overWriteIfNewer>true</overWriteIfNewer>
+                </configuration>
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.rat</groupId>
