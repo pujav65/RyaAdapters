@@ -44,12 +44,19 @@ under the License.
         <jena.arq.version>2.8.7</jena.arq.version>
         <jena.iri.version>0.8</jena.iri.version>
         <pellet.version>2.3.6-ansell</pellet.version>
+        <jersey.version>1.9</jersey.version>
+        <fluo.version>1.0.0-incubating</fluo.version>
     </properties>
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.apache.rya</groupId>
                 <artifactId>rya.jena.sesame</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.rya</groupId>
+                <artifactId>rya.export.accumulo</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -67,6 +74,28 @@ under the License.
                 <artifactId>iri</artifactId>
                 <version>${jena.iri.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-client</artifactId>
+                <version>${jersey.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-server</artifactId>
+                <version>${jersey.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-json</artifactId>
+                <version>${jersey.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.jersey.contribs</groupId>
+                <artifactId>jersey-multipart</artifactId>
+                <version>${jersey.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.github.ansell.pellet</groupId>
                 <artifactId>pellet-jena</artifactId>
@@ -96,6 +125,45 @@ under the License.
                 <groupId>com.github.ansell.pellet</groupId>
                 <artifactId>pellet-examples</artifactId>
                 <version>${pellet.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.fluo</groupId>
+                <artifactId>fluo-api</artifactId>
+                <version>${fluo.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.fluo</groupId>
+                <artifactId>fluo-core</artifactId>
+                <version>${fluo.version}</version>
+                <exclusions>
+                    <!-- released under the LGPL license -->
+                    <exclusion>
+                        <groupId>com.google.code.findbugs</groupId>
+                        <artifactId>jsr305</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.fluo</groupId>
+                <artifactId>fluo-mini</artifactId>
+                <version>${fluo.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.fluo</groupId>
+                <artifactId>fluo-recipes-core</artifactId>
+                <version>${fluo.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.fluo</groupId>
+                <artifactId>fluo-recipes-accumulo</artifactId>
+                <version>${fluo.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.fluo</groupId>
+                <artifactId>fluo-recipes-test</artifactId>
+                <version>${fluo.version}</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -327,12 +395,22 @@ under the License.
                 </executions>
             </plugin>
             <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>**/*IntegrationTest.java
-                        </exclude>
+                        <exclude>**/*IntegrationTest.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
