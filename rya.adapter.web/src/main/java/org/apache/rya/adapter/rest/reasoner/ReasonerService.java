@@ -41,7 +41,6 @@ import org.apache.rya.api.domain.RyaURI;
 import org.apache.rya.api.persist.RyaDAO;
 import org.apache.rya.rdftriplestore.RdfCloudTripleStore;
 import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.repository.sail.SailRepositoryConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -88,16 +87,7 @@ public class ReasonerService {
         //final String uploadedFileLocation = SERVER_UPLOAD_LOCATION_FOLDER + fileDetail.getFileName();
         final String uploadedFileLocation = SERVER_UPLOAD_LOCATION_FOLDER + FilenameUtils.getName(hiddenFilename);
 
-        SailRepositoryConnection conn = null;
-        try {
-            conn = repository.getConnection();
-        } catch (final Exception e) {
-            final String errorMessage = "Failed to connect to repository";
-            log.error(errorMessage, e);
-            return Response.status(-1).entity(errorMessage).build();
-        }
-
-        final RdfCloudTripleStore rdfCloudTripleStore = ((RdfCloudTripleStore)repository.getSail());
+        final RdfCloudTripleStore<?> rdfCloudTripleStore = ((RdfCloudTripleStore<?>)repository.getSail());
         final RyaDAO<?> ryaDao = rdfCloudTripleStore.getRyaDAO();
         final RdfCloudTripleStoreConfiguration conf = ryaDao.getConf();
 
@@ -118,7 +108,7 @@ public class ReasonerService {
         final ReasonerType reasonerType = ReasonerType.fromName(reasonerTypeName);
         ReasonerResult reasonerResult;
         try {
-            reasonerResult = reasonerDao.startReasoner(conn, uploadedFileLocation, reasonerType);
+            reasonerResult = reasonerDao.startReasoner(repository, uploadedFileLocation, reasonerType);
         } catch (final Exception e) {
             final String errorMessage = "Error encountered while running reasoner on the ontology file on the server";
             log.error(errorMessage, e);

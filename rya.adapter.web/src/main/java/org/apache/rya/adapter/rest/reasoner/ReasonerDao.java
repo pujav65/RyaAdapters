@@ -20,7 +20,7 @@ package org.apache.rya.adapter.rest.reasoner;
 
 import org.apache.rya.adapter.rest.reasoner.types.ReasonerResult;
 import org.apache.rya.adapter.rest.reasoner.types.ReasonerRunner;
-import org.openrdf.repository.sail.SailRepositoryConnection;
+import org.openrdf.repository.sail.SailRepository;
 
 /**
  * The reasoner DAO.
@@ -29,18 +29,18 @@ public class ReasonerDao {
     /**
      * Starts the reasoner using the rule file specified and the reasoner
      * specified.
-     * @param conn the {@link SailRepositoryConnection}.
+     * @param repo the {@link SailRepository}.
      * @param filename the name of the rule file.
      * @param reasonerType the {@link ReasonerType}.
      * @return the {@link ReasonerResult}.
      * @throws Exception
      */
-    public ReasonerResult startReasoner(final SailRepositoryConnection conn, final String filename, final ReasonerType reasonerType) throws Exception {
+    public ReasonerResult startReasoner(final SailRepository repo, final String filename, final ReasonerType reasonerType) throws Exception {
         switch (reasonerType) {
             case JENA:
             case PELLET:
                 final ReasonerRunner reasonerRunner = reasonerType.getReasonerRunner();
-                final ReasonerResult reasonerResult = reasonerRunner.runReasoner(conn, filename);
+                final ReasonerResult reasonerResult = reasonerRunner.runReasoner(repo, filename);
                 return reasonerResult;
             default:
                 throw new Exception("Unknown reasoner type specified: " + reasonerType.toString());

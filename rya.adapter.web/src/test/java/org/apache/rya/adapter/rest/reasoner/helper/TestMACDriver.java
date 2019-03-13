@@ -92,5 +92,6 @@ public class TestMACDriver {
 
         dao.add(RdfToRyaConversions.convertStatement(stmt1));
         dao.add(RdfToRyaConversions.convertStatement(stmt2));
+        dao.flush();
     }
 }

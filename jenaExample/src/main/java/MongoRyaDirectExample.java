@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
 
@@ -38,8 +39,9 @@ import org.apache.rya.api.persist.RyaDAO;
 import org.apache.rya.api.persist.RyaDAOException;
 import org.apache.rya.api.persist.query.RyaQuery;
 import org.apache.rya.api.resolver.RdfToRyaConversions;
-import org.apache.rya.indexing.GeoConstants;
 import org.apache.rya.indexing.accumulo.ConfigUtils;
+import org.apache.rya.indexing.mongodb.MongoIndexingConfiguration;
+import org.apache.rya.indexing.mongodb.MongoIndexingConfiguration.MongoDBIndexingConfigBuilder;
 import org.apache.rya.jena.example.pellet.BnodeQueryExample;
 import org.apache.rya.jena.example.pellet.ExplanationExample;
 import org.apache.rya.jena.example.pellet.IncrementalClassifierExample;
@@ -56,12 +58,11 @@ import org.apache.rya.jena.example.pellet.SPARQLDLExample;
 import org.apache.rya.jena.example.pellet.TerpExample;
 import org.apache.rya.jena.example.pellet.util.ExampleUtils;
 import org.apache.rya.jena.jenasesame.JenaSesame;
-import org.apache.rya.mongodb.MockMongoFactory;
-import org.apache.rya.mongodb.MongoConnectorFactory;
-import org.apache.rya.mongodb.MongoDBRdfConfiguration;
+import org.apache.rya.mongodb.EmbeddedMongoFactory;
 import org.apache.rya.mongodb.MongoDBRyaDAO;
 import org.apache.rya.rdftriplestore.RdfCloudTripleStore;
 import org.apache.rya.sail.config.RyaSailFactory;
+import org.apache.zookeeper.ClientCnxn;
 import org.calrissian.mango.collect.CloseableIterable;
 import org.openrdf.model.Statement;
 import org.openrdf.model.impl.StatementImpl;
@@ -78,7 +79,6 @@ import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.repository.sail.SailRepositoryConnection;
 import org.openrdf.sail.Sail;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.InfModel;
@@ -92,11 +92,14 @@ import com.hp.hpl.jena.reasoner.Reasoner;
 import com.hp.hpl.jena.reasoner.rulesys.GenericRuleReasoner;
 import com.hp.hpl.jena.reasoner.rulesys.Rule;
 import com.hp.hpl.jena.reasoner.rulesys.Rule.Parser;
-import com.mongodb.MongoClient;
-import com.mongodb.ServerAddress;
+
+import de.flapdoodle.embed.mongo.config.IMongoConfig;
+import de.flapdoodle.embed.mongo.config.Net;
 
 public class MongoRyaDirectExample {
     private static final Logger log = Logger.getLogger(MongoRyaDirectExample.class);
+
+    private static final boolean IS_DETAILED_LOGGING_ENABLED = false;
 
     //
     // Connection configuration parameters
@@ -107,11 +110,26 @@ public class MongoRyaDirectExample {
     private static final String MONGO_COLL_PREFIX = "rya_";
     private static final boolean USE_MOCK = true;
     private static final boolean USE_INFER = true;
+    private static final String MONGO_USER = null;
+    private static final String MONGO_PASSWORD = null;
     private static final String MONGO_INSTANCE_URL = "localhost";
     private static final String MONGO_INSTANCE_PORT = "27017";
 
+    public static void setupLogging() {
+        final Logger rootLogger = LogManager.getRootLogger();
+        rootLogger.setLevel(Level.OFF);
+        final ConsoleAppender ca = (ConsoleAppender) rootLogger.getAppender("stdout");
+        ca.setLayout(new PatternLayout("%d{MMM dd yyyy HH:mm:ss} %5p [%t] (%F:%L) - %m%n"));
+        rootLogger.setLevel(Level.INFO);
+        // Filter out noisy messages from the following classes.
+        Logger.getLogger(ClientCnxn.class).setLevel(Level.OFF);
+        Logger.getLogger(EmbeddedMongoFactory.class).setLevel(Level.OFF);
+    }
+
     public static void main(final String[] args) throws Exception {
-        setupLogging();
+        if (IS_DETAILED_LOGGING_ENABLED) {
+            setupLogging();
+        }
         final Configuration conf = getConf();
         conf.setBoolean(ConfigUtils.DISPLAY_QUERY_PLAN, PRINT_QUERIES);
 
@@ -140,24 +158,7 @@ public class MongoRyaDirectExample {
             log.info("Shutting down");
             closeQuietly(conn);
             closeQuietly(repository);
-            if (mock != null) {
-                mock.shutdown();
-            }
-            MongoConnectorFactory.closeMongoClient();
         }
-    }
-
-    public static void setupLogging() {
-        // Turn off all the loggers and customize how they write to the console.
-        final Logger rootLogger = LogManager.getRootLogger();
-        rootLogger.setLevel(Level.OFF);
-        final ConsoleAppender ca = (ConsoleAppender) rootLogger.getAppender("stdout");
-        //ca.setLayout(new PatternLayout("%-5p - %m%n"));
-        ca.setLayout(new PatternLayout("%d{MMM dd yyyy HH:mm:ss} %5p [%t] (%F:%L) - %m%n"));
-
-        // Turn the loggers used by the demo back on.
-        //log.setLevel(Level.INFO);
-        rootLogger.setLevel(Level.INFO);
     }
 
 //    private static void testAddPointAndWithinSearch(SailRepositoryConnection conn) throws Exception {
@@ -235,39 +236,29 @@ public class MongoRyaDirectExample {
         }
     }
 
-    private static MockMongoFactory mock = null;
     private static Configuration getConf() throws IOException {
 
-        final MongoDBRdfConfiguration conf = new MongoDBRdfConfiguration();
-        conf.set(ConfigUtils.USE_MONGO, "true");
+        MongoDBIndexingConfigBuilder builder = MongoIndexingConfiguration.builder()
+            .setUseMockMongo(USE_MOCK).setUseInference(USE_INFER).setAuths("U");
 
         if (USE_MOCK) {
-            mock = MockMongoFactory.newFactory();
-            final MongoClient c = mock.newMongoClient();
-            final ServerAddress address = c.getAddress();
-            final String url = address.getHost();
-            final String port = Integer.toString(address.getPort());
-            c.close();
-            conf.set(MongoDBRdfConfiguration.MONGO_INSTANCE, url);
-            conf.set(MongoDBRdfConfiguration.MONGO_INSTANCE_PORT, port);
+            final EmbeddedMongoFactory factory = EmbeddedMongoFactory.newFactory();
+            final IMongoConfig connectionConfig = factory.getMongoServerDetails();
+            final Net net = connectionConfig.net();
+            builder.setMongoHost(net.getBindIp() == null ? "127.0.0.1" : net.getBindIp())
+                   .setMongoPort(net.getPort() + "");
         } else {
             // User name and password must be filled in:
-            conf.set(MongoDBRdfConfiguration.MONGO_USER, "fill this in");
-            conf.set(MongoDBRdfConfiguration.MONGO_USER_PASSWORD, "fill this in");
-            conf.set(MongoDBRdfConfiguration.MONGO_INSTANCE, MONGO_INSTANCE_URL);
-            conf.set(MongoDBRdfConfiguration.MONGO_INSTANCE_PORT, MONGO_INSTANCE_PORT);
+            builder = builder.setMongoUser(MONGO_USER)
+                             .setMongoPassword(MONGO_PASSWORD)
+                             .setMongoHost(MONGO_INSTANCE_URL)
+                             .setMongoPort(MONGO_INSTANCE_PORT);
         }
-        conf.set(MongoDBRdfConfiguration.MONGO_DB_NAME, MONGO_DB);
-        conf.set(MongoDBRdfConfiguration.MONGO_COLLECTION_PREFIX, MONGO_COLL_PREFIX);
-        conf.set(ConfigUtils.GEO_PREDICATES_LIST, "http://www.opengis.net/ont/geosparql#asWKT");
-//        conf.set(ConfigUtils.USE_GEO, "true");
-        conf.set(ConfigUtils.USE_FREETEXT, "true");
-        conf.setTablePrefix(MONGO_COLL_PREFIX);
-        conf.set(ConfigUtils.GEO_PREDICATES_LIST, GeoConstants.GEO_AS_WKT.stringValue());
-        conf.set(ConfigUtils.FREETEXT_PREDICATES_LIST, RDFS.LABEL.stringValue());
-        conf.set(ConfigUtils.FREETEXT_PREDICATES_LIST, RDFS.LABEL.stringValue());
-        conf.set(RdfCloudTripleStoreConfiguration.CONF_INFER, Boolean.toString(USE_INFER));
-        return conf;
+
+        return builder.setMongoDBName(MONGO_DB)
+               .setUseMongoFreetextIndex(true)
+               .setMongoFreeTextPredicates(RDFS.LABEL.stringValue()).build();
+
     }
 
     protected static StatementImpl createStatement(final String subject, final String predicate, final String object) {
@@ -309,8 +300,8 @@ public class MongoRyaDirectExample {
 
             Reasoner reasoner = null;
             try (
-                final InputStream in = IOUtils.toInputStream(ruleSource, Charsets.UTF_8);
-                final BufferedReader br = new BufferedReader(new InputStreamReader(in));
+                final InputStream in = IOUtils.toInputStream(ruleSource, StandardCharsets.UTF_8);
+                final BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
             ) {
                 final Parser parser = Rule.rulesParserFromReader(br);
                 reasoner = new GenericRuleReasoner(Rule.parseRules(parser));
@@ -425,7 +416,7 @@ public class MongoRyaDirectExample {
         }
 
         public void resetCount() {
-            this.count = 0;
+            count = 0;
         }
 
         @Override
@@ -444,14 +435,10 @@ public class MongoRyaDirectExample {
 
         @Override
         public void handleBoolean(final boolean arg0) throws QueryResultHandlerException {
-          // TODO Auto-generated method stub
-
         }
 
         @Override
         public void handleLinks(final List<String> arg0) throws QueryResultHandlerException {
-          // TODO Auto-generated method stub
-
         }
     }
 }

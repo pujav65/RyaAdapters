@@ -23,7 +23,7 @@ under the License.
     <parent>
         <groupId>org.apache.rya</groupId>
         <artifactId>rya-adapter-examples</artifactId>
-        <version>3.2.11-incubating-SNAPSHOT</version>
+        <version>3.2.13-incubating-SNAPSHOT</version>
     </parent>
 
     <artifactId>rya.adapter.web</artifactId>
@@ -35,6 +35,26 @@ under the License.
         <dependency>
             <groupId>org.apache.rya</groupId>
             <artifactId>rya.jena.sesame</artifactId>
+        </dependency>
+
+        <!--  Accumulo -->
+        <dependency>
+            <groupId>org.apache.accumulo</groupId>
+            <artifactId>accumulo-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.accumulo</groupId>
+            <artifactId>accumulo-start</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.accumulo</groupId>
+            <artifactId>accumulo</artifactId>
+            <version>${accumulo.version}</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.thrift</groupId>
+            <artifactId>libthrift</artifactId>
         </dependency>
 
         <dependency>
@@ -156,6 +176,12 @@ under the License.
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.rya</groupId>
+            <artifactId>mongodb.rya</artifactId>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
     </dependencies>

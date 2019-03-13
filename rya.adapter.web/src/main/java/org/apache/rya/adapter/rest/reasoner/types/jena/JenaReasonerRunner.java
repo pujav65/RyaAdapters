@@ -22,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,9 +33,8 @@ import org.apache.rya.api.domain.RyaStatement;
 import org.apache.rya.api.domain.RyaStatement.RyaStatementBuilder;
 import org.apache.rya.api.domain.RyaURI;
 import org.apache.rya.jena.jenasesame.JenaSesame;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.sail.SailRepositoryConnection;
+import org.openrdf.repository.sail.SailRepository;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.InfModel;
@@ -56,14 +56,13 @@ public class JenaReasonerRunner implements ReasonerRunner {
     private static final Logger log = Logger.getLogger(JenaReasonerRunner.class);
 
     @Override
-    public ReasonerResult runReasoner(final SailRepositoryConnection conn, final String filename) throws Exception {
+    public ReasonerResult runReasoner(final SailRepository repo, final String filename) throws Exception {
         final List<RyaStatement> ryaStatements = new ArrayList<>();
-        final Repository repo = conn.getRepository();
-        RepositoryConnection queryConnection = null;
+        RepositoryConnection conn = null;
         try {
-            queryConnection = repo.getConnection();
+            conn = repo.getConnection();
 
-            final Dataset dataset = JenaSesame.createDataset(queryConnection);
+            final Dataset dataset = JenaSesame.createDataset(conn);
 
             final Model model = dataset.getDefaultModel();
             log.info(model.getNsPrefixMap());
@@ -72,7 +71,7 @@ public class JenaReasonerRunner implements ReasonerRunner {
             Reasoner reasoner = null;
             try (
                 final FileInputStream fin = new FileInputStream(file);
-                final BufferedReader br = new BufferedReader(new InputStreamReader(fin));
+                final BufferedReader br = new BufferedReader(new InputStreamReader(fin, StandardCharsets.UTF_8));
             ) {
                 final Parser parser = Rule.rulesParserFromReader(br);
                 reasoner = new GenericRuleReasoner(Rule.parseRules(parser));
@@ -100,8 +99,8 @@ public class JenaReasonerRunner implements ReasonerRunner {
             }
             log.info("Result count : " + count);
         } finally {
-            if (queryConnection != null) {
-                queryConnection.close();
+            if (conn != null) {
+                conn.close();
             }
         }
         final ReasonerResult reasonerResult = new ReasonerResult(ryaStatements);

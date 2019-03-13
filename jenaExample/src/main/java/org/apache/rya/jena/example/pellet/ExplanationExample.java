@@ -28,7 +28,9 @@ package org.apache.rya.jena.example.pellet;
 
 import static org.apache.rya.jena.example.pellet.util.ExampleUtils.createRyaStatement;
 
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
 
@@ -88,7 +90,7 @@ public class ExplanationExample implements PelletExampleRunner {
         // The renderer is used to pretty print explanation
         final ManchesterSyntaxExplanationRenderer renderer = new ManchesterSyntaxExplanationRenderer();
         // The writer used for the explanation rendered
-        final PrintWriter out = new PrintWriter( System.out );
+        final PrintWriter out = new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8), true);
         renderer.startRendering( out );
 
         // Create an OWLAPI manager that allows to load an ontology file and

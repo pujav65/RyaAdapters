@@ -30,13 +30,13 @@ import org.apache.rya.api.domain.RyaStatement;
 import org.apache.rya.api.domain.RyaStatement.RyaStatementBuilder;
 import org.apache.rya.api.domain.RyaType;
 import org.apache.rya.api.domain.RyaURI;
+import org.apache.rya.api.resolver.RyaToRdfConversions;
 import org.apache.rya.jena.jenasesame.JenaSesame;
 import org.mindswap.pellet.jena.PelletReasonerFactory;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.XMLSchema;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.sail.SailRepositoryConnection;
+import org.openrdf.repository.sail.SailRepository;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Dataset;
@@ -57,14 +57,13 @@ public class PelletReasonerRunner implements ReasonerRunner {
     private static final Logger log = Logger.getLogger(PelletReasonerRunner.class);
 
     @Override
-    public ReasonerResult runReasoner(final SailRepositoryConnection conn, final String filename) throws Exception {
+    public ReasonerResult runReasoner(final SailRepository repo, final String filename) throws Exception {
         final List<RyaStatement> ryaStatements = new ArrayList<>();
-        final Repository repo = conn.getRepository();
-        RepositoryConnection queryConnection = null;
+        RepositoryConnection conn = null;
         try {
-            queryConnection = repo.getConnection();
+            conn = repo.getConnection();
 
-            final Dataset dataset = JenaSesame.createDataset(queryConnection);
+            final Dataset dataset = JenaSesame.createDataset(conn);
 
             final Model adapterModel = dataset.getDefaultModel();
 
@@ -95,13 +94,16 @@ public class PelletReasonerRunner implements ReasonerRunner {
 
                 log.info(subject.toString() + " " + predicate.toString() + " " + object.toString());
                 model.add(stmt);
+
+                // TODO: figure out why the infModel doesn't make its way back to the Sail repo connection automatically
+                conn.add(RyaToRdfConversions.convertStatement(ryaStatement));
                 ryaStatements.add(ryaStatement);
                 count++;
             }
             log.info("Result count : " + count);
         } finally {
-            if (queryConnection != null) {
-                queryConnection.close();
+            if (conn != null) {
+                conn.close();
             }
         }
         final ReasonerResult reasonerResult = new ReasonerResult(ryaStatements);

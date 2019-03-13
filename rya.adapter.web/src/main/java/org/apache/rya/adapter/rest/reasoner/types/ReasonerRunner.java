@@ -18,7 +18,7 @@
  */
 package org.apache.rya.adapter.rest.reasoner.types;
 
-import org.openrdf.repository.sail.SailRepositoryConnection;
+import org.openrdf.repository.sail.SailRepository;
 
 /**
  * Interface for running a reasoner.
@@ -26,10 +26,10 @@ import org.openrdf.repository.sail.SailRepositoryConnection;
 public interface ReasonerRunner {
     /**
      * Runs the reasoner using the file specified.
-     * @param conn the {@link SailRepositoryConnection}.
+     * @param repo the {@link SailRepository}.
      * @param filename the filename path.
      * @return the {@link ReasonerResult}.
      * @throws Exception
      */
-    public ReasonerResult runReasoner(final SailRepositoryConnection conn, final String filename) throws Exception;
+    public ReasonerResult runReasoner(final SailRepository repo, final String filename) throws Exception;
 }

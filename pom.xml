@@ -22,12 +22,12 @@ under the License.
     <parent>
         <groupId>org.apache.rya</groupId>
         <artifactId>rya-project</artifactId>
-        <version>3.2.11-incubating-SNAPSHOT</version>
+        <version>3.2.13-incubating-SNAPSHOT</version>
     </parent>
 
     <groupId>org.apache.rya</groupId>
     <artifactId>rya-adapter-examples</artifactId>
-    <version>3.2.11-incubating-SNAPSHOT</version>
+    <version>3.2.13-incubating-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
@@ -38,6 +38,7 @@ under the License.
         <module>rya.jena.sesame</module>
         <module>jenaExample</module>
         <module>rya.jena.legacy.adapter</module> <!-- For use with Jena 3.x -->
+        <module>rya.adapter.web</module>
     </modules>
     <properties>
         <jena.core.version>2.6.4</jena.core.version>
@@ -164,6 +165,16 @@ under the License.
                 <artifactId>fluo-recipes-test</artifactId>
                 <version>${fluo.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-aop</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context-support</artifactId>
+                <version>${spring.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -431,14 +442,76 @@ under the License.
         <repository>
             <id>LocationTech - SNAPSHOT</id>
             <url>https://repo.locationtech.org/content/repositories/snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>  <!--  disable snapshot repositories while there are no snapshot dependencies -->
+            </snapshots>
         </repository>
         <repository>
             <id>LocationTech - RELEASE</id>
             <url>https://repo.locationtech.org/content/repositories/releases/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
         <repository>
             <id>LocationTech - Third Party</id>
             <url>https://repo.locationtech.org/content/repositories/thirdparty/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>geowave-maven-releases</id>
+            <name>GeoWave AWS Release Repository</name>
+            <url>https://s3.amazonaws.com/geowave-maven/release</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>geowave-maven-snapshot</id>
+            <name>GeoWave AWS Snapshot Repository</name>
+            <url>https://s3.amazonaws.com/geowave-maven/snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>  <!--  disable snapshot repositories while there are no snapshot dependencies -->
+            </snapshots>
+        </repository>
+        <repository>
+            <id>osgeo</id>
+            <name>Open Source Geospatial Foundation Repository</name>
+            <url>http://download.osgeo.org/webdav/geotools/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>boundlessgeo</id>
+            <name>Boundless Geospatial Software and Open Source GIS‎ Repository</name>
+            <url>https://repo.boundlessgeo.com/main/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
     </repositories>
 
