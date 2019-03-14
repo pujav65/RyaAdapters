@@ -31,14 +31,15 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.jena.shared.JenaException;
-import org.apache.jena.shared.PrefixMapping;
-import org.apache.jena.sparql.ARQNotImplemented;
-import org.apache.jena.sparql.core.DatasetPrefixStorage;
 import org.openrdf.model.Namespace;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
+
+import com.hp.hpl.jena.shared.JenaException;
+import com.hp.hpl.jena.shared.PrefixMapping;
+import com.hp.hpl.jena.sparql.ARQNotImplemented;
+import com.hp.hpl.jena.sparql.core.DatasetPrefixStorage;
 
 /**
  * Jena Sesame Prefix Storage.
@@ -159,7 +160,7 @@ public class JenaSesameDatasetPrefixStorage implements DatasetPrefixStorage {
     }
 
     @Override
-    public void removeFromPrefixMap(final String graphName, final String prefix) {
+    public void removeFromPrefixMap(final String graphName, final String prefix, final String uri) {
         try {
             connection.removeNamespace(prefix);
         } catch (final RepositoryException e) {
@@ -173,6 +174,10 @@ public class JenaSesameDatasetPrefixStorage implements DatasetPrefixStorage {
 
     @Override
     public void sync() {
+    }
+
+    @Override
+    public void sync(final boolean force) {
     }
 }
 

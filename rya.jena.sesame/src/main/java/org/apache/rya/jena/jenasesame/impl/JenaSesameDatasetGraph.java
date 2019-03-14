@@ -28,20 +28,20 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Iterator;
 
-import org.apache.jena.graph.Graph;
-import org.apache.jena.graph.Node;
-import org.apache.jena.query.ReadWrite;
-import org.apache.jena.shared.Lock;
-import org.apache.jena.shared.LockMRSW;
-import org.apache.jena.sparql.ARQException;
-import org.apache.jena.sparql.core.DatasetGraph;
-import org.apache.jena.sparql.core.Quad;
-import org.apache.jena.sparql.util.Context;
 import org.apache.log4j.Logger;
 import org.openrdf.model.Resource;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
+
+import com.hp.hpl.jena.graph.Graph;
+import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.shared.LockMRSW;
+import com.hp.hpl.jena.sparql.ARQException;
+import com.hp.hpl.jena.sparql.core.DatasetGraph;
+import com.hp.hpl.jena.sparql.core.Quad;
+import com.hp.hpl.jena.sparql.util.Context;
 
 /**
  * Jena Sesame Dataset Graph.
@@ -118,10 +118,6 @@ public class JenaSesameDatasetGraph implements DatasetGraph {
     }
 
     @Override
-    public void add(final Node g, final Node s, final Node p, final Node o) {
-    }
-
-    @Override
     public void addGraph(final Node graphName, final Graph graph) {
     }
 
@@ -137,10 +133,6 @@ public class JenaSesameDatasetGraph implements DatasetGraph {
 
     @Override
     public void delete(final Quad quad) {
-    }
-
-    @Override
-    public void delete(final Node g, final Node s, final Node p, final Node o) {
     }
 
     @Override
@@ -183,36 +175,6 @@ public class JenaSesameDatasetGraph implements DatasetGraph {
 
     @Override
     public void setDefaultGraph(final Graph g) {
-    }
-
-    @Override
-    public void clear() {
-    }
-
-    @Override
-    public void begin(final ReadWrite readWrite) {
-    }
-
-    @Override
-    public void commit() {
-    }
-
-    @Override
-    public void abort() {
-    }
-
-    @Override
-    public boolean isInTransaction() {
-        return false;
-    }
-
-    @Override
-    public void end() {
-    }
-
-    @Override
-    public boolean supportsTransactions() {
-        return false;
     }
 }
 

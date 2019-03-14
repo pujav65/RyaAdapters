@@ -26,20 +26,20 @@ package org.apache.rya.jena.jenasesame.impl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.apache.jena.atlas.io.IndentedWriter;
-import org.apache.jena.atlas.lib.NotImplemented;
-import org.apache.jena.graph.Node;
-import org.apache.jena.sparql.ARQException;
-import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.engine.binding.Binding;
-import org.apache.jena.sparql.engine.binding.BindingFactory;
-import org.apache.jena.sparql.engine.binding.BindingMap;
-import org.apache.jena.sparql.engine.iterator.QueryIteratorBase;
-import org.apache.jena.sparql.serializer.SerializationContext;
+import org.openjena.atlas.io.IndentedWriter;
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.TupleQueryResult;
+
+import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.sparql.ARQException;
+import com.hp.hpl.jena.sparql.core.Var;
+import com.hp.hpl.jena.sparql.engine.binding.Binding;
+import com.hp.hpl.jena.sparql.engine.binding.BindingFactory;
+import com.hp.hpl.jena.sparql.engine.binding.BindingMap;
+import com.hp.hpl.jena.sparql.engine.iterator.QueryIteratorBase;
+import com.hp.hpl.jena.sparql.serializer.SerializationContext;
 
 /**
  * Sesame Query Iterator.
@@ -77,7 +77,7 @@ public class QueryIteratorSesame extends QueryIteratorBase {
     protected Binding moveToNextBinding() {
         try {
             final BindingSet bindingSet = result.next();
-            final BindingMap arqBinding = BindingFactory.create();
+            final BindingMap arqBinding = (BindingMap) BindingFactory.create();
 
             for (final String bindingName : result.getBindingNames()) {
                 final Value value = bindingSet.getValue(bindingName);
@@ -92,11 +92,6 @@ public class QueryIteratorSesame extends QueryIteratorBase {
 
     @Override
     public void output(final IndentedWriter out, final SerializationContext sCxt) {
-    }
-
-    @Override
-    protected void requestCancel() {
-        throw new NotImplemented();
     }
 }
 

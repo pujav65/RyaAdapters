@@ -27,13 +27,6 @@ package org.apache.rya.jena.jenasesame.example;
 import java.io.File;
 import java.net.URL;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.sparql.util.QueryExecUtils;
 import org.apache.log4j.Logger;
 import org.apache.rya.jena.jenasesame.JenaSesame;
 import org.openrdf.repository.Repository;
@@ -42,6 +35,14 @@ import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.sail.memory.MemoryStore;
 import org.springframework.util.ResourceUtils;
+
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.sparql.util.QueryExecUtils;
 
 /**
  * Example: Create an in-memory repository, load some RDF, and query it.

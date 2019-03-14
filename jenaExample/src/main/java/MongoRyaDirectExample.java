@@ -21,48 +21,49 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.InfModel;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.StmtIterator;
-import org.apache.jena.reasoner.Reasoner;
-import org.apache.jena.reasoner.rulesys.GenericRuleReasoner;
-import org.apache.jena.reasoner.rulesys.Rule;
-import org.apache.jena.reasoner.rulesys.Rule.Parser;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.apache.rya.api.RdfCloudTripleStoreConfiguration;
+import org.apache.log4j.PatternLayout;
 import org.apache.rya.api.RdfCloudTripleStoreConfiguration;
 import org.apache.rya.api.domain.RyaStatement;
 import org.apache.rya.api.persist.RyaDAO;
 import org.apache.rya.api.persist.RyaDAOException;
 import org.apache.rya.api.persist.query.RyaQuery;
 import org.apache.rya.api.resolver.RdfToRyaConversions;
-import org.apache.rya.indexing.GeoConstants;
-import org.apache.rya.indexing.GeoConstants;
 import org.apache.rya.indexing.accumulo.ConfigUtils;
-import org.apache.rya.indexing.accumulo.ConfigUtils;
+import org.apache.rya.indexing.mongodb.MongoIndexingConfiguration;
+import org.apache.rya.indexing.mongodb.MongoIndexingConfiguration.MongoDBIndexingConfigBuilder;
+import org.apache.rya.jena.example.pellet.BnodeQueryExample;
+import org.apache.rya.jena.example.pellet.ExplanationExample;
+import org.apache.rya.jena.example.pellet.IncrementalClassifierExample;
+import org.apache.rya.jena.example.pellet.IncrementalConsistencyExample;
+import org.apache.rya.jena.example.pellet.IndividualsExample;
+import org.apache.rya.jena.example.pellet.InterruptReasoningExample;
+import org.apache.rya.jena.example.pellet.JenaReasoner;
+import org.apache.rya.jena.example.pellet.ModularityExample;
+import org.apache.rya.jena.example.pellet.OWLAPIExample;
+import org.apache.rya.jena.example.pellet.PelletExampleRunner;
+import org.apache.rya.jena.example.pellet.PersistenceExample;
+import org.apache.rya.jena.example.pellet.RulesExample;
+import org.apache.rya.jena.example.pellet.SPARQLDLExample;
+import org.apache.rya.jena.example.pellet.TerpExample;
+import org.apache.rya.jena.example.pellet.util.ExampleUtils;
 import org.apache.rya.jena.jenasesame.JenaSesame;
-import org.apache.rya.mongodb.MockMongoFactory;
-import org.apache.rya.mongodb.MongoConnectorFactory;
-import org.apache.rya.mongodb.MongoDBRdfConfiguration;
-import org.apache.rya.mongodb.MongoDBRdfConfiguration;
+import org.apache.rya.mongodb.EmbeddedMongoFactory;
 import org.apache.rya.mongodb.MongoDBRyaDAO;
 import org.apache.rya.rdftriplestore.RdfCloudTripleStore;
-import org.apache.rya.rdftriplestore.RdfCloudTripleStore;
 import org.apache.rya.sail.config.RyaSailFactory;
-import org.apache.rya.sail.config.RyaSailFactory;
+import org.apache.zookeeper.ClientCnxn;
 import org.calrissian.mango.collect.CloseableIterable;
-import org.glassfish.grizzly.http.util.Charsets;
 import org.openrdf.model.Statement;
 import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
@@ -78,11 +79,27 @@ import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.repository.sail.SailRepositoryConnection;
 import org.openrdf.sail.Sail;
 
-import com.mongodb.MongoClient;
-import com.mongodb.ServerAddress;
+import com.google.common.collect.ImmutableList;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.rdf.model.InfModel;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.reasoner.Reasoner;
+import com.hp.hpl.jena.reasoner.rulesys.GenericRuleReasoner;
+import com.hp.hpl.jena.reasoner.rulesys.Rule;
+import com.hp.hpl.jena.reasoner.rulesys.Rule.Parser;
+
+import de.flapdoodle.embed.mongo.config.IMongoConfig;
+import de.flapdoodle.embed.mongo.config.Net;
 
 public class MongoRyaDirectExample {
     private static final Logger log = Logger.getLogger(MongoRyaDirectExample.class);
+
+    private static final boolean IS_DETAILED_LOGGING_ENABLED = false;
 
     //
     // Connection configuration parameters
@@ -93,10 +110,26 @@ public class MongoRyaDirectExample {
     private static final String MONGO_COLL_PREFIX = "rya_";
     private static final boolean USE_MOCK = true;
     private static final boolean USE_INFER = true;
+    private static final String MONGO_USER = null;
+    private static final String MONGO_PASSWORD = null;
     private static final String MONGO_INSTANCE_URL = "localhost";
     private static final String MONGO_INSTANCE_PORT = "27017";
 
+    public static void setupLogging() {
+        final Logger rootLogger = LogManager.getRootLogger();
+        rootLogger.setLevel(Level.OFF);
+        final ConsoleAppender ca = (ConsoleAppender) rootLogger.getAppender("stdout");
+        ca.setLayout(new PatternLayout("%d{MMM dd yyyy HH:mm:ss} %5p [%t] (%F:%L) - %m%n"));
+        rootLogger.setLevel(Level.INFO);
+        // Filter out noisy messages from the following classes.
+        Logger.getLogger(ClientCnxn.class).setLevel(Level.OFF);
+        Logger.getLogger(EmbeddedMongoFactory.class).setLevel(Level.OFF);
+    }
+
     public static void main(final String[] args) throws Exception {
+        if (IS_DETAILED_LOGGING_ENABLED) {
+            setupLogging();
+        }
         final Configuration conf = getConf();
         conf.setBoolean(ConfigUtils.DISPLAY_QUERY_PLAN, PRINT_QUERIES);
 
@@ -116,15 +149,15 @@ public class MongoRyaDirectExample {
             log.info("Running Jena Sesame Reasoning with Rules Example");
             testJenaSesameReasoningWithRules(conn);
 
+            testPelletExamples(null);
+
             log.info("TIME: " + (System.currentTimeMillis() - start) / 1000.);
+        } catch(final Exception e) {
+            log.error("Encountered error running MongoDB example", e);
         } finally {
             log.info("Shutting down");
             closeQuietly(conn);
             closeQuietly(repository);
-            if (mock != null) {
-                mock.shutdown();
-            }
-            MongoConnectorFactory.closeMongoClient();
         }
     }
 
@@ -203,47 +236,39 @@ public class MongoRyaDirectExample {
         }
     }
 
-    private static MockMongoFactory mock = null;
     private static Configuration getConf() throws IOException {
 
-        final MongoDBRdfConfiguration conf = new MongoDBRdfConfiguration();
-        conf.set(ConfigUtils.USE_MONGO, "true");
+        MongoDBIndexingConfigBuilder builder = MongoIndexingConfiguration.builder()
+            .setUseMockMongo(USE_MOCK).setUseInference(USE_INFER).setAuths("U");
 
         if (USE_MOCK) {
-            mock = MockMongoFactory.newFactory();
-            final MongoClient c = mock.newMongoClient();
-            final ServerAddress address = c.getAddress();
-            final String url = address.getHost();
-            final String port = Integer.toString(address.getPort());
-            c.close();
-            conf.set(MongoDBRdfConfiguration.MONGO_INSTANCE, url);
-            conf.set(MongoDBRdfConfiguration.MONGO_INSTANCE_PORT, port);
+            final EmbeddedMongoFactory factory = EmbeddedMongoFactory.newFactory();
+            final IMongoConfig connectionConfig = factory.getMongoServerDetails();
+            final Net net = connectionConfig.net();
+            builder.setMongoHost(net.getBindIp() == null ? "127.0.0.1" : net.getBindIp())
+                   .setMongoPort(net.getPort() + "");
         } else {
             // User name and password must be filled in:
-            conf.set(MongoDBRdfConfiguration.MONGO_USER, "fill this in");
-            conf.set(MongoDBRdfConfiguration.MONGO_USER_PASSWORD, "fill this in");
-            conf.set(MongoDBRdfConfiguration.MONGO_INSTANCE, MONGO_INSTANCE_URL);
-            conf.set(MongoDBRdfConfiguration.MONGO_INSTANCE_PORT, MONGO_INSTANCE_PORT);
+            builder = builder.setMongoUser(MONGO_USER)
+                             .setMongoPassword(MONGO_PASSWORD)
+                             .setMongoHost(MONGO_INSTANCE_URL)
+                             .setMongoPort(MONGO_INSTANCE_PORT);
         }
-        conf.set(MongoDBRdfConfiguration.MONGO_DB_NAME, MONGO_DB);
-        conf.set(MongoDBRdfConfiguration.MONGO_COLLECTION_PREFIX, MONGO_COLL_PREFIX);
-        conf.set(ConfigUtils.GEO_PREDICATES_LIST, "http://www.opengis.net/ont/geosparql#asWKT");
-//        conf.set(ConfigUtils.USE_GEO, "true");
-        conf.set(ConfigUtils.USE_FREETEXT, "true");
-        conf.setTablePrefix(MONGO_COLL_PREFIX);
-        conf.set(ConfigUtils.GEO_PREDICATES_LIST, GeoConstants.GEO_AS_WKT.stringValue());
-        conf.set(ConfigUtils.FREETEXT_PREDICATES_LIST, RDFS.LABEL.stringValue());
-        conf.set(ConfigUtils.FREETEXT_PREDICATES_LIST, RDFS.LABEL.stringValue());
-        conf.set(RdfCloudTripleStoreConfiguration.CONF_INFER, Boolean.toString(USE_INFER));
-        return conf;
+
+        return builder.setMongoDBName(MONGO_DB)
+               .setUseMongoFreetextIndex(true)
+               .setMongoFreeTextPredicates(RDFS.LABEL.stringValue()).build();
+
     }
+
     protected static StatementImpl createStatement(final String subject, final String predicate, final String object) {
         return new StatementImpl(new URIImpl(subject), new URIImpl(predicate), new URIImpl(object));
     }
 
     protected static StatementImpl createStatement(final String subject, final String predicate, final String object, final String namespace) {
         return createStatement(namespace + subject, namespace + predicate, namespace + object);
-}
+    }
+
     private static void testJenaSesameReasoningWithRules(final SailRepositoryConnection conn) throws Exception {
         final Repository repo = conn.getRepository();
         RepositoryConnection addConnection = null;
@@ -275,8 +300,8 @@ public class MongoRyaDirectExample {
 
             Reasoner reasoner = null;
             try (
-                final InputStream in = IOUtils.toInputStream(ruleSource, Charsets.UTF8_CHARSET);
-                final BufferedReader br = new BufferedReader(new InputStreamReader(in));
+                final InputStream in = IOUtils.toInputStream(ruleSource, StandardCharsets.UTF_8);
+                final BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
             ) {
                 final Parser parser = Rule.rulesParserFromReader(br);
                 reasoner = new GenericRuleReasoner(Rule.parseRules(parser));
@@ -288,7 +313,7 @@ public class MongoRyaDirectExample {
 
             int count = 0;
             while (iterator.hasNext()) {
-                final org.apache.jena.rdf.model.Statement stmt = iterator.nextStatement();
+                final com.hp.hpl.jena.rdf.model.Statement stmt = iterator.nextStatement();
 
                 final Resource subject = stmt.getSubject();
                 final Property predicate = stmt.getPredicate();
@@ -324,6 +349,7 @@ public class MongoRyaDirectExample {
             }
         }
     }
+
     protected static boolean containsStatement(final RyaStatement ryaStatement, final RyaDAO<? extends RdfCloudTripleStoreConfiguration> ryaDao) throws RyaDAOException, IOException {
         final RyaQuery ryaQuery = new RyaQuery(ryaStatement);
         final CloseableIterable<RyaStatement> closeableIter = ryaDao.getQueryEngine().query(ryaQuery);
@@ -343,6 +369,45 @@ public class MongoRyaDirectExample {
         return count > 0;
     }
 
+    private static void testPelletExamples(final SailRepositoryConnection conn) throws Exception {
+        log.info("STARTING PELLET EXAMPLES...");
+
+        final List<PelletExampleRunner> pelletExamples = ImmutableList.<PelletExampleRunner>builder()
+            .add(new BnodeQueryExample(conn))
+            .add(new ExplanationExample(conn))
+            .add(new IncrementalClassifierExample(conn))
+            .add(new IncrementalConsistencyExample(conn))
+            .add(new IndividualsExample(conn))
+            .add(new InterruptReasoningExample(conn))
+            .add(new JenaReasoner(conn))
+            .add(new ModularityExample(conn))
+            .add(new OWLAPIExample(conn))
+            .add(new PersistenceExample(conn))
+            //.add(new QuerySubsumptionExample(conn)) // XXX Doesn't work when run from here
+            .add(new RulesExample(conn))
+            .add(new SPARQLDLExample(conn))
+            .add(new TerpExample(conn))
+            .build();
+
+        int i = 1;
+        for (final PelletExampleRunner pelletExample : pelletExamples) {
+            final String exampleName = pelletExample.getClass().getSimpleName();
+            log.info("Starting Pellet Example " + i + ": " + exampleName);
+            try {
+                pelletExample.run();
+            } finally {
+                if (conn != null) {
+                    ExampleUtils.getRyaDao(conn).dropAndDestroy();
+                }
+                pelletExample.cleanUp();
+            }
+            log.info("Finished Pellet Example " + i + ": " + exampleName);
+            i++;
+        }
+
+        log.info("FINISHED PELLET EXAMPLES");
+    }
+
     private static class CountingResultHandler implements TupleQueryResultHandler {
         private int count = 0;
 
@@ -351,7 +416,7 @@ public class MongoRyaDirectExample {
         }
 
         public void resetCount() {
-            this.count = 0;
+            count = 0;
         }
 
         @Override
@@ -370,14 +435,10 @@ public class MongoRyaDirectExample {
 
         @Override
         public void handleBoolean(final boolean arg0) throws QueryResultHandlerException {
-          // TODO Auto-generated method stub
-
         }
 
         @Override
         public void handleLinks(final List<String> arg0) throws QueryResultHandlerException {
-          // TODO Auto-generated method stub
-
         }
     }
 }

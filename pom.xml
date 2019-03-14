@@ -22,12 +22,12 @@ under the License.
     <parent>
         <groupId>org.apache.rya</groupId>
         <artifactId>rya-project</artifactId>
-        <version>3.2.11-incubating-SNAPSHOT</version>
+        <version>3.2.13-incubating-SNAPSHOT</version>
     </parent>
 
     <groupId>org.apache.rya</groupId>
     <artifactId>rya-adapter-examples</artifactId>
-    <version>3.2.11-incubating-SNAPSHOT</version>
+    <version>3.2.13-incubating-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
@@ -35,33 +35,150 @@ under the License.
         <maven>${maven.min-version}</maven>
     </prerequisites>
     <modules>
-       <module>rya.jena.sesame</module>
+        <module>rya.jena.sesame</module>
         <module>jenaExample</module>
+        <module>rya.jena.legacy.adapter</module> <!-- For use with Jena 3.x -->
+        <module>rya.adapter.web</module>
     </modules>
-	 <properties>
-	 <jena.core.version>3.1.0</jena.core.version>
-	 <jena.arq.version>3.1.0</jena.arq.version>
-</properties>
-   <dependencyManagement>
- 	<dependencies>
-	    <dependency>
-            <groupId>org.apache.rya</groupId>
-            <artifactId>rya.jena.sesame</artifactId>
-			<version>${project.version}</version>
-        </dependency>
-		<dependency>
-                <groupId>org.apache.jena</groupId>
-                <artifactId>jena-core</artifactId>
+    <properties>
+        <jena.core.version>2.6.4</jena.core.version>
+        <jena.arq.version>2.8.7</jena.arq.version>
+        <jena.iri.version>0.8</jena.iri.version>
+        <pellet.version>2.3.6-ansell</pellet.version>
+        <jersey.version>1.9</jersey.version>
+        <fluo.version>1.0.0-incubating</fluo.version>
+    </properties>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.rya</groupId>
+                <artifactId>rya.jena.sesame</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.rya</groupId>
+                <artifactId>rya.export.accumulo</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hp.hpl.jena</groupId>
+                <artifactId>jena</artifactId>
                 <version>${jena.core.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.jena</groupId>
-                <artifactId>jena-arq</artifactId>
+                <groupId>com.hp.hpl.jena</groupId>
+                <artifactId>arq</artifactId>
                 <version>${jena.arq.version}</version>
-			</dependency>
-	</dependencies>
-   </dependencyManagement>
- 
+            </dependency>
+            <dependency>
+                <groupId>com.hp.hpl.jena</groupId>
+                <artifactId>iri</artifactId>
+                <version>${jena.iri.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-client</artifactId>
+                <version>${jersey.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-server</artifactId>
+                <version>${jersey.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-json</artifactId>
+                <version>${jersey.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.jersey.contribs</groupId>
+                <artifactId>jersey-multipart</artifactId>
+                <version>${jersey.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.ansell.pellet</groupId>
+                <artifactId>pellet-jena</artifactId>
+                <version>${pellet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.ansell.pellet</groupId>
+                <artifactId>pellet-owlapiv3</artifactId>
+                <version>${pellet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.ansell.pellet</groupId>
+                <artifactId>pellet-modularity</artifactId>
+                <version>${pellet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.ansell.pellet</groupId>
+                <artifactId>pellet-explanation</artifactId>
+                <version>${pellet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.ansell.pellet</groupId>
+                <artifactId>pellet-query</artifactId>
+                <version>${pellet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.ansell.pellet</groupId>
+                <artifactId>pellet-examples</artifactId>
+                <version>${pellet.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.fluo</groupId>
+                <artifactId>fluo-api</artifactId>
+                <version>${fluo.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.fluo</groupId>
+                <artifactId>fluo-core</artifactId>
+                <version>${fluo.version}</version>
+                <exclusions>
+                    <!-- released under the LGPL license -->
+                    <exclusion>
+                        <groupId>com.google.code.findbugs</groupId>
+                        <artifactId>jsr305</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.fluo</groupId>
+                <artifactId>fluo-mini</artifactId>
+                <version>${fluo.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.fluo</groupId>
+                <artifactId>fluo-recipes-core</artifactId>
+                <version>${fluo.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.fluo</groupId>
+                <artifactId>fluo-recipes-accumulo</artifactId>
+                <version>${fluo.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.fluo</groupId>
+                <artifactId>fluo-recipes-test</artifactId>
+                <version>${fluo.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-aop</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context-support</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <build>
         <pluginManagement>
             <plugins>
@@ -245,11 +362,25 @@ under the License.
         </pluginManagement>
 
         <plugins>
-           <!-- Fail any build that doesn't use the project's Java version. -->
-           <plugin>
-               <groupId>org.codehaus.mojo</groupId>
-               <artifactId>animal-sniffer-maven-plugin</artifactId>
-           </plugin>
+            <!-- Fail any build that doesn't use the project's Java version. -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>animal-sniffer-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <!-- Apache Release Audit Tool - reports missing license headers and other issues. -->
+                <!-- Note: Add exclusions to deepest maven submodule/project in the plug-in management section -->
+                <groupId>org.apache.rat</groupId>
+                <artifactId>apache-rat-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>check-licenses</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <artifactId>maven-source-plugin</artifactId>
                 <executions>
@@ -275,12 +406,22 @@ under the License.
                 </executions>
             </plugin>
             <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>**/*IntegrationTest.java
-                        </exclude>
+                        <exclude>**/*IntegrationTest.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -301,14 +442,76 @@ under the License.
         <repository>
             <id>LocationTech - SNAPSHOT</id>
             <url>https://repo.locationtech.org/content/repositories/snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>  <!--  disable snapshot repositories while there are no snapshot dependencies -->
+            </snapshots>
         </repository>
         <repository>
             <id>LocationTech - RELEASE</id>
             <url>https://repo.locationtech.org/content/repositories/releases/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
         <repository>
             <id>LocationTech - Third Party</id>
             <url>https://repo.locationtech.org/content/repositories/thirdparty/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>geowave-maven-releases</id>
+            <name>GeoWave AWS Release Repository</name>
+            <url>https://s3.amazonaws.com/geowave-maven/release</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>geowave-maven-snapshot</id>
+            <name>GeoWave AWS Snapshot Repository</name>
+            <url>https://s3.amazonaws.com/geowave-maven/snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>  <!--  disable snapshot repositories while there are no snapshot dependencies -->
+            </snapshots>
+        </repository>
+        <repository>
+            <id>osgeo</id>
+            <name>Open Source Geospatial Foundation Repository</name>
+            <url>http://download.osgeo.org/webdav/geotools/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>boundlessgeo</id>
+            <name>Boundless Geospatial Software and Open Source GIS‎ Repository</name>
+            <url>https://repo.boundlessgeo.com/main/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
     </repositories>
 
